@@ -12,7 +12,12 @@ void send_request(zmq::socket_t& socket, const std::string& request) {
 
 std::string recv_reply(zmq::socket_t& socket) {
     zmq::message_t reply;
-    socket.recv(reply, zmq::recv_flags::none);
+    auto result = socket.recv(reply, zmq::recv_flags::none);
+    if (!result) {
+	std::cerr << "Failed to receive reply from server" << std::endl;
+	return "";
+    }
+    
     return std::string(static_cast<char*>(reply.data()), reply.size());
 }
 

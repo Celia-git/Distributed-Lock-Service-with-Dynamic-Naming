@@ -1,5 +1,6 @@
 #include <zmq.hpp>
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <unordered_map>
 #include <mutex>
@@ -44,7 +45,11 @@ int main() {
 
     while (true) {
         zmq::message_t request;
-        socket.recv(request, zmq::recv_flags::none);
+	auto result = socket.recv(request, zmq::recv_flags::none);
+	if (!result) {
+		std::cerr << "Error: Package receipt corrupted or non existent" << std::endl;
+		continue;	
+	}
         std::string message(static_cast<char*>(request.data()), request.size());
 
         std::string reply = handle_request(message);
